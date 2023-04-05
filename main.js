@@ -26,7 +26,7 @@ fetch('https://api.ipify.org/?format=json')
 //           networkdownlink: navigator.connection.downlink,
 //         };
 
-        console.log(deviceInfo);
+//         console.log(deviceInfo);
 
         db.collection("userIp").add({
             ipAddress, time: new Date(), geoBasicInfo,
